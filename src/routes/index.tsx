@@ -610,17 +610,30 @@ function TrustedContacts() {
 }
 
 /* ---------------- Geofence ---------------- */
-function GeofenceCard() {
+function GeofenceCard({ radius, onRadiusChange }: { radius: number; onRadiusChange: (v: number) => void }) {
   const zones = [
-    { icon: Home, label: "Home", radius: "200m", color: "#2ED2A8", on: true },
-    { icon: Building2, label: "Office", radius: "500m", color: "#4DA3FF", on: true },
-    { icon: UserPlus, label: "Friend's House", radius: "150m", color: "#7B61FF", on: false },
-    { icon: Pin, label: "Custom", radius: "1km", color: "#FF4D9D", on: false },
+    { icon: Home, label: "Home", color: "#2ED2A8", on: true },
+    { icon: Building2, label: "Office", color: "#4DA3FF", on: true },
+    { icon: UserPlus, label: "Friend's House", color: "#7B61FF", on: false },
+    { icon: Pin, label: "Custom", color: "#FF4D9D", on: false },
   ];
   return (
     <div className="glass rounded-3xl p-5">
       <div className="text-sm font-semibold mb-1">Geofence Safe Zones</div>
       <div className="text-[11px] text-muted-foreground mb-3">Get alerted when entering or leaving</div>
+
+      <div className="mb-4 p-3 rounded-xl border border-white/10 bg-white/[0.02]">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[11px] text-muted-foreground">Active zone radius</span>
+          <span className="text-xs font-mono text-[#FF4D9D]">{radius < 1000 ? `${radius}m` : `${(radius / 1000).toFixed(1)}km`}</span>
+        </div>
+        <input
+          type="range" min={100} max={2000} step={50}
+          value={radius} onChange={(e) => onRadiusChange(Number(e.target.value))}
+          className="w-full accent-[#FF4D9D]"
+        />
+      </div>
+
       <ul className="space-y-2">
         {zones.map((z) => (
           <li key={z.label} className="flex items-center gap-3 p-2 rounded-xl border border-white/5 hover:border-white/15 transition">
@@ -629,7 +642,7 @@ function GeofenceCard() {
             </div>
             <div className="flex-1">
               <div className="text-xs font-medium">{z.label}</div>
-              <div className="text-[10px] text-muted-foreground">Radius {z.radius}</div>
+              <div className="text-[10px] text-muted-foreground">Live geofence: {radius}m</div>
             </div>
             <Toggle on={z.on} />
           </li>
