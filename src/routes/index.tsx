@@ -780,9 +780,15 @@ function ThreatBanner({ onClose, onSOS }: { onClose: () => void; onSOS: () => vo
 }
 
 /* ---------------- Incident FAB ---------------- */
-function IncidentFAB() {
+function IncidentFAB({ onDrop }: { onDrop: (c: IncidentPin["category"]) => void }) {
   const [open, setOpen] = useState(false);
-  const cats = ["Harassment", "Stalking", "Robbery", "Road Danger", "Suspicious Person", "Poor Lighting"];
+  const cats: { key: IncidentPin["category"]; label: string; color: string }[] = [
+    { key: "harassment", label: "Harassment", color: "#EF4444" },
+    { key: "stalking", label: "Stalking", color: "#F59E0B" },
+    { key: "robbery", label: "Robbery", color: "#EC4899" },
+    { key: "road", label: "Road Danger", color: "#06B6D4" },
+    { key: "suspicious", label: "Suspicious Person", color: "#8B5CF6" },
+  ];
   return (
     <>
       <button
@@ -799,11 +805,16 @@ function IncidentFAB() {
               <div className="font-display text-lg font-bold">Report Incident</div>
               <button onClick={() => setOpen(false)} className="w-8 h-8 rounded-lg hover:bg-white/10 grid place-items-center"><X className="w-4 h-4" /></button>
             </div>
-            <div className="text-xs text-muted-foreground mb-4">Help your community stay safe. Anonymous by default.</div>
+            <div className="text-xs text-muted-foreground mb-4">Help your community stay safe. Pin drops on your current location.</div>
             <div className="grid grid-cols-2 gap-2">
               {cats.map(c => (
-                <button key={c} onClick={() => setOpen(false)} className="px-3 py-3 text-xs rounded-xl border border-white/10 bg-white/[0.03] hover:border-[#FF4D9D]/40 hover:bg-[#FF4D9D]/10 transition font-medium">
-                  {c}
+                <button
+                  key={c.key}
+                  onClick={() => { onDrop(c.key); setOpen(false); }}
+                  className="px-3 py-3 text-xs rounded-xl border border-white/10 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06] transition font-medium flex items-center gap-2"
+                >
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.color, boxShadow: `0 0 12px ${c.color}` }} />
+                  {c.label}
                 </button>
               ))}
             </div>
