@@ -210,14 +210,23 @@ function Header({ onSOS }: { onSOS: () => void }) {
 }
 
 /* ---------------- Live Location Map ---------------- */
-function LiveLocationCard({ mode, onModeChange }: { mode: Mode; onModeChange: (m: Mode) => void }) {
+function LiveLocationCard({
+  mode, onModeChange, center, user, incidents, geofenceRadius,
+}: {
+  mode: Mode; onModeChange: (m: Mode) => void;
+  center: { lat: number; lng: number };
+  user: { lat: number; lng: number } | null;
+  incidents: IncidentPin[];
+  geofenceRadius: number;
+}) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const modes: { key: Mode; label: string; icon: any }[] = [
     { key: "day", label: "Day", icon: Sun },
     { key: "evening", label: "Evening", icon: Cloud },
     { key: "night", label: "Night", icon: Moon },
     { key: "rush", label: "Rush", icon: Zap },
   ];
-  const overlayColor = mode === "day" ? "#2ED2A8" : mode === "evening" ? "#FFB547" : mode === "rush" ? "#FF4D9D" : "#FF3366";
 
   return (
     <div className="glass rounded-3xl p-5 relative overflow-hidden">
@@ -247,8 +256,14 @@ function LiveLocationCard({ mode, onModeChange }: { mode: Mode; onModeChange: (m
       </div>
 
       {/* Map */}
-      <div className="relative h-[380px] rounded-2xl overflow-hidden border border-white/10 bg-[#0a0d18]">
-        <MapVisual color={overlayColor} mode={mode} />
+      <div className="relative h-[420px] rounded-2xl overflow-hidden border border-white/10 bg-[#0a0d18] z-0">
+        {mounted ? (
+          <Suspense fallback={<div className="w-full h-full grid place-items-center text-muted-foreground text-sm">Loading map…</div>}>
+            <LiveMap center={center} user={user} mode={mode} incidents={incidents} geofenceRadius={geofenceRadius} />
+          </Suspense>
+        ) : (
+          <div className="w-full h-full grid place-items-center text-muted-foreground text-sm">Initializing map…</div>
+        )}
 
         {/* Mode badge */}
         <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full glass-strong text-xs font-semibold flex items-center gap-2">
